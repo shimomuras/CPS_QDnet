@@ -1,16 +1,15 @@
 function [fluorescence_result,previous_Energy_list]=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys)
 choice_parameter;
-load('changed_param.mat');
 data_parameter;
 %%
 % %initialize
 QD_type_number=length(quantum_type_number);
 
-excited_QD_number=zeros(1,quantum_number);
+excited_QD_number=zeros(1,cell_num^2);
 fluorescence_qd_sum_wavelength=zeros(1,QD_type_number);
 fluorescence_total=zeros(length(quantum_type_number),1);
 fluorescence_result=zeros(plot_num,QD_type_number+1);
-excited_QD_number_list=zeros(plot_num,quantum_number);
+excited_QD_number_list=zeros(plot_num,cell_num^2);
 %%
 
 %radiation speed, of absorbtion cross ssection, of satuation
@@ -64,7 +63,7 @@ for i=1:plot_num
     
     excited_QD_number=result_QD_number;
     excited_QD_number_list(i,:)=excited_QD_number;
-    for s=1:quantum_number
+    for s=1:cell_num^2
         for t=1:length(quantum_type_number)
             if Q_type_seq(s)==t
                 fluorescence_qd_sum_wavelength(t)=fluorescence_qd_sum_wavelength(t)+fluorescence(s);
