@@ -26,10 +26,9 @@ QD_wavelength=[550,600,0]*10^-9;
 quantum_type_number=[1,1,1];
 
 %number of QD in network [number]
-cell_num=3;
+cell_num=10;
 
-%type rate of donor QD
-QD_type_rate=0.8;
+
 
 %irradiation wavelength
 irr_wavelength=400*10^-9;
@@ -76,7 +75,7 @@ Rep_freq=1000;
 sat_intensity=2.8*10^6;
 
  
-Initial_Input=2.8*10^6;
+Initial_Input=2.8*10^3;
 
 Intensity_amp=log10(Initial_Input/sat_intensity);%[W/cm^2]
 %Intensity/Rep_freq/time_integral;

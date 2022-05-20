@@ -33,10 +33,16 @@ for  i=1:Q_number
     
     %飽和エネルギーの記述
     sat_energy_matrix(i)=QD_energy_spect(Q_type_seq(i))/(total_tau(i));
-    if isnan(sat_energy_matrix(i))==1||sat_energy_matrix(i)==Inf
-        sat_energy_matrix(i)=0;
+    if isnan(sat_energy_matrix(i))==1
+        sat_energy_matrix(i)=Inf;
     end
 
     fluorescence_lifetime_matrix(i)=fluorescence_lifetime(Q_type_seq(i));
 end
 N_total_list=sat_energy_matrix./energy_spectrum_list;
+
+for check_term=1:length(N_total_list)
+    if isnan(N_total_list(check_term))==1
+        N_total_list(check_term)=Inf;
+    end
+end

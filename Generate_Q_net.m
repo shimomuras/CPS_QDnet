@@ -1,4 +1,4 @@
-function [networkSys,Generated_qd_distance,position_value]=Generate_Q_net(Q_type_seq,cell_num,qdot_lifetime,...
+function [networkSys,Generated_qd_distance,position_value]=Generate_Q_net(it_num,Q_type_seq,cell_num,qdot_lifetime,...
                                                          quantum_eff,qd_size,quantum_type_number,...
                                                          folder_name,refrac,kai2,Na)
 
@@ -14,7 +14,7 @@ function [networkSys,Generated_qd_distance,position_value]=Generate_Q_net(Q_type
 networkSys=zeros(cell_num^2);
 
 
-[Generated_qd_distance, position_value]=distance_matrix_fix(cell_num,qd_size,folder_name);
+[Generated_qd_distance, position_value]=distance_matrix_fix(cell_num,qd_size,folder_name,Q_type_seq,it_num);
 
 for i=1:cell_num^2
     for j=i:cell_num^2

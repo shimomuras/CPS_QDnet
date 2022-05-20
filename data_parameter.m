@@ -1,5 +1,5 @@
 %folder_name;
-folder_name=strcat('time_step_',show_time_step,'_FRET_',FRET_implementation,'_type_',irradiation_type,'_node_',num2str(Q_number));
+
 
 
 
@@ -11,7 +11,7 @@ qd_size=6.9;%[nm]
 %QD_540:6.1 nm, QD_580:7.6 nm
 
 %fluorescence lifetime [QD540,QD580] ref lifetime_check
-fluorescence_lifetime=[8.55 7.85 0]*10^-9;
+fluorescence_lifetime=[8.55 7.85 1000]*10^-9;
 
 %optical speed
 c=2.99792458*10^8;
@@ -21,7 +21,7 @@ h=6.62607004*10^-34;
 
 %energy spectrum of QD
 QD_energy_spect=h*c./QD_wavelength;
-% QD_energy_spect(3)=0;
+QD_energy_spect(3)=0;
 %refractive index
 refrac=1.4;
 

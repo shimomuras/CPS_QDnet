@@ -1,4 +1,4 @@
-function [distance_value, position_value]=distance_matrix_fix(cell_num,qd_size,folder_name)
+function [distance_value, position_value]=distance_matrix_fix(cell_num,qd_size,folder_name,Q_type_seq,it_num)
 % clear all
 % close all
 % %
@@ -32,43 +32,40 @@ for i=1:cell_num^2
 end
 
 
+save(strcat(folder_name,'/QD_posi_',num2str(it_num),'.mat'),'Q_type_seq','position_value')
+%mac
+calib_scale=72/96;
+%windows
+% calib_scale=1;
+clf
+square_distance=qd_size*(cell_num+1);
+fig=gcf;
+fig.Units='points';
+fig.InnerPosition=[100 100 400 400];
+sz=(qd_size/2*450/square_distance*calib_scale)^2*pi;
 
-% %mac
-% calib_scale=72/96;
-% %windows
-% % calib_scale=1;
-% clf
-% fig=gcf;
-% fig.Units='points';
-% fig.InnerPosition=[100 100 400 400];
-% sz=(qd_size/2*400/square_distance*calib_scale)^2*pi;
+
+for i=1:length(Q_type_seq)
+    if Q_type_seq(i)==1
+        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','b','MarkerEdgeColor','b')
+    elseif Q_type_seq(i)==2
+        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','g','MarkerEdgeColor','g')
+    elseif Q_type_seq(i)==3
+        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','None','MarkerEdgeColor','None')
+    end
+    if i~=length(Q_type_seq)
+        hold on
+    end
+end
 % 
-% 
-% for i=1:length(Q_type_seq)
-%     if Q_type_seq(i)==1
-%         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','b','MarkerEdgeColor','b')
-%     elseif Q_type_seq(i)==2
-%         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','g','MarkerEdgeColor','g')
-%     elseif Q_type_seq(i)==3
-%         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','y','MarkerEdgeColor','y')
-%     elseif Q_type_seq(i)==4
-%         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','r','MarkerEdgeColor','r')
-%     elseif Q_type_seq(i)==5
-%         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','k','MarkerEdgeColor','k')
-%     end
-%     if i~=length(Q_type_seq)
-%         hold on
-%     end
-% end
-% % 
-% xlabel('Posiiton [nm]')
-% xlabel('Posiiton [nm]')
-% 
-% xlim([0,square_distance])
-% ylim([0,square_distance])
-% 
-% fig_name=strcat(folder_name,'/Qdot_plot/graph_',num2str(QD_net_number),'.fig');
-%  saveas(fig,fig_name)
+xlabel('Posiiton [nm]')
+ylabel('Posiiton [nm]')
+
+xlim([0,square_distance])
+ylim([0,square_distance])
+title(strcat('Iteration: ',num2str(it_num)))
+fig_name=strcat(folder_name,'/Qdot_plot/graph_',num2str(it_num),'.jpg');
+ saveas(fig,fig_name)
 % disp('dekita')
 % close(gcf)
 
