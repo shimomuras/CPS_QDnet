@@ -1,6 +1,6 @@
 close all
 clear all
-folder_name=strcat('Result/',datestr(datetime('now')));
+folder_name=strcat('Result/',datestr(datetime('now'),'yyyymmdd/HHMM'));
 %%
 %%%%
 % label_tau_list=[0.1857; 0.1610; 0.2990]*10^-9;
@@ -11,7 +11,7 @@ ref_diff_rate=100;
 diff_rate=100;
 rate_amp=10;
 iter_num=1;
-temp_num=10;
+temp_num=1;
 change_prob_num=10;
 temp_dec_rate=0.9;
 ini_temp=5*10^-2;
