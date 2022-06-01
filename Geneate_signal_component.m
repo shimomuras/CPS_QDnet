@@ -4,19 +4,6 @@ choice_parameter;
 data_parameter;
 
 
-gauss_fix_parameter=zeros(1,cell_num^2);
-%*******************************ここからコード********************************
-%フォルダの作成
-% folder_name=strcat('Parameter_',num2str(sum(quantum_type_number)),'type_',num2str(quantum_number),'num_',num2str(square_distance),'nm_','gauss_',num2str(gauss_fix));
-%
-%
-% if exist(folder_name)~=0
-%     rmdir(folder_name,'s');
-% end
-% mkdir(folder_name)
-% mkdir(strcat(folder_name,'/Qdot_plot'))
-
-
 plot_num=round(time_scale/time_span+1);
 
 
@@ -26,21 +13,8 @@ for QD_net_number=1:Q_number
     
     modify_target_func=target_func;
     
-    %     reduced_time=0:time_step:time_scale;
-    %     expand_value=int64(time_step/time_span);
-    
-    %     Irr=zeros(length(time),1);
+
     Irr=convert_pulse_square(modify_target_func);
-    
-    
-    
-    
-    
-    %     disp('Prepare network')
-    %Q-networkの組成とネットワークのノード間結合力
-  
-    
-    
     
     [networkSys,~,position_value]=Generate_Q_net(it_num,QD_type_seq,cell_num,fluorescence_lifetime,...
         Qdot_eff,qd_size,quantum_type_number,...
@@ -56,8 +30,6 @@ for QD_net_number=1:Q_number
     else
         Irr_fix=Irr*ones(1,cell_num^2);
     end
-    
-    
     
     
     

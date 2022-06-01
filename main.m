@@ -1,11 +1,11 @@
 close all
 clear all
-folder_name=datestr(datetime('now'));
+folder_name=strcat('Result/',datestr(datetime('now')));
 label_tau_value=7.85*10^-9;
 ref_diff_rate=1;
 diff_rate=1;
 rate_amp=10;
-iter_num=2;
+iter_num=1;
 temp_num=100;
 change_prob_num=10;
 temp_dec_rate=0.9;
@@ -18,35 +18,11 @@ ave_tau_list=zeros(iter_num*temp_num,1);
 
 choice_parameter;
 change_prob=change_prob_num/cell_num^2;
-% switch change_val_name
-%     case 'time_step'
-%         time_step=changed_val;
-%         ns=10^9;
-%         show_time_step=strcat(num2str(time_step*ns),'ns');
-%     case 'total_data_num'
-%         total_data_num=changed_val;
-%     case 'quantum_number'
-%         quantum_number=changed_val;
-%     case 'irr_wavelength'
-%         irr_wavelength=changed_val;
-%     case 'square_distance'
-%         square_distance=changed_val;
-%     case 'Q_number'
-%         Q_number=changed_val;
-%     case 'Initial_Input'
-%         Initial_Input=changed_val;
-%     case 'QD_type_rate'
-%         QD_type_rate=changed_val;
-%     otherwise
-% end
-% save('changed_param.mat','time_step','show_time_step','total_data_num','quantum_number','irr_wavelength','square_distance','Q_number','Initial_Input','QD_type_rate')
 [target_func,norm_value]=choice_irradiation;
 data_parameter;
 %ÉtÉHÉãÉ_ÇÃçÏê¨
 %folder_name=strcat('Parameter_',num2str(sum(quantum_type_number)),'type_',num2str(quantum_number),'num_',num2str(square_distance),'nm_gauss_',num2str(gauss_fix),'_dalay_',delay_point);
-if exist(folder_name)~=0
-    rmdir(folder_name,'s');
-end
+
 mkdir(folder_name)
 mkdir(strcat(folder_name,'/Qdot_plot'))
 mkdir(strcat(folder_name,'/ref_Qdot_plot'))
@@ -160,12 +136,15 @@ end
 
 %%
 close all
+% fig1=figure
 plot(ref_diff_rate_list)
-ylim([0 .1])
+% ylim([0 .1])
 ylabel('Loss function')
 xlabel('Iteration')
-save(gca,strcat(folder_name,'/loss_function.fig'))
+set(gca,'FontSize',16)
+saveas(gca,strcat(folder_name,'/loss_function.fig'))
 [~,min_QD_net_num]=min(diff_rate_list)
+
 
 save(strcat(folder_name,'/choice_parameter.mat'),...
     'diff_rate_list','time_step','time_span','time_scale','cell_num','irr_wavelength','square_distance','Initial_Input','iter_num','rate_amp','min_QD_net_num');
