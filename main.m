@@ -10,8 +10,8 @@ label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
 ref_diff_rate=100;
 diff_rate=100;
 rate_amp=10;
-iter_num=1;
-temp_num=1;
+iter_num=5;
+temp_num=5;
 change_prob_num=10;
 temp_dec_rate=0.9;
 ini_temp=5*10^-2;
@@ -158,6 +158,7 @@ for tm_num=1:temp_num
         % diff_rate=ref_diff_rate*rate_amp;
     end
 end
+save(strcat(folder_name,'/result.mat'),'ave_tau_list','diff_rate_list','ref_diff_rate_list')
 
 %%
 close all
@@ -168,7 +169,10 @@ ylabel('Loss function')
 xlabel('Iteration')
 set(gca,'FontSize',16)
 saveas(gca,strcat(folder_name,'/loss_function.fig'))
+
+
 [~,min_QD_net_num]=min(diff_rate_list);
+
 
 
 save(strcat(folder_name,'/choice_parameter.mat'),...
