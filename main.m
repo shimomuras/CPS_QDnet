@@ -158,7 +158,7 @@ for tm_num=1:temp_num
         % diff_rate=ref_diff_rate*rate_amp;
     end
 end
-save(strcat(folder_name,'/result.mat'),'ave_tau_list','diff_rate_list','ref_diff_rate_list')
+save(strcat(folder_name,'/result.mat'),'ave_tau_list','diff_rate_list','ref_diff_rate_list','label_tau_list')
 
 %%
 close all
