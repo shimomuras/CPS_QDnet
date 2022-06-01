@@ -1,4 +1,4 @@
-function [rad_speed,abs_matrix,sat_energy_matrix,fluorescence_lifetime_matrix,energy_spectrum_list,N_total_list]=set_QD_param(Q_type_seq,networkSys)
+function [rad_speed,abs_matrix,sat_energy_matrix,fluorescence_lifetime_matrix,energy_spectrum_list,N_total_list]=set_QD_param(Q_type_seq,networkSys,irr_wavelength)
 choice_parameter;
 data_parameter;
 
@@ -13,6 +13,8 @@ fluorescence_lifetime_matrix=zeros(1,Q_number);
 transfer_FRET_speed=sum(transpose(networkSys));
 energy_spectrum_list=zeros(1,Q_number);
 
+% %excitation frequency
+% exc_freq=c/(irr_wavelength*10^-9);
 
 for  i=1:Q_number
     %radiative coefficient
@@ -39,6 +41,7 @@ for  i=1:Q_number
 
     fluorescence_lifetime_matrix(i)=fluorescence_lifetime(Q_type_seq(i));
 end
+
 N_total_list=sat_energy_matrix./energy_spectrum_list;
 
 for check_term=1:length(N_total_list)
