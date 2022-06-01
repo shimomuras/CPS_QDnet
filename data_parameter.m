@@ -29,7 +29,7 @@ refrac=1.4;
 kai2=2/3;
 
 %excitation frequency
-exc_freq=c/(irr_wavelength*10^-9);
+% exc_freq=c/(irr_wavelength*10^-9);
 
 mol_concentration_540=4.6*10^-7;
 mol_concentration_580=4.6*10^-7;
@@ -52,7 +52,7 @@ mol_abs(2)=Quantum_dots_abs(2)/(mol_concentration_580*light_distance);
 
 %absorption crosscection[cm^-1]
 Na=6.022*10^23;
-abs_area=mol_abs./log10(exp(1))./Na;
+abs_area=1000*mol_abs./log10(exp(1))./Na;
 
 
 %fluorescence_spectrum

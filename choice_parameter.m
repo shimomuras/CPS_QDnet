@@ -31,7 +31,7 @@ cell_num=3;
 
 
 %irradiation wavelength
-irr_wavelength=400*10^-9;
+% irr_wavelength=400*10^-9;
 
 %netowork size [nm^2]
 square_distance=100;

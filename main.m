@@ -1,27 +1,36 @@
 close all
 clear all
 folder_name=strcat('Result/',datestr(datetime('now')));
-label_tau_value=7.85*10^-9;
-ref_diff_rate=1;
-diff_rate=1;
+%%
+%%%%
+label_tau_list=[0.1857; 0.1610; 0.2990]*10^-9;
+% label_tau_value=[0.4871 0.8282 0.5770]*10^-9;
+% label_tau_value=[0.9302 0.4190 0.6792]*10^-9;
+
+ref_diff_rate=100;
+diff_rate=100;
 rate_amp=10;
 iter_num=1;
-temp_num=100;
+temp_num=10;
 change_prob_num=10;
 temp_dec_rate=0.9;
 ini_temp=5*10^-2;
 ini_list=0:1:temp_num-1;
+irr_wavelength_list=[400 425 450]*10^-9;
+irr_wavelength=irr_wavelength_list(1);
+WL_tau_list=zeros(length(irr_wavelength_list),1);
+
 temp_list=ini_temp*temp_dec_rate.^ini_list;
+
+
 diff_rate_list=zeros(iter_num*temp_num,1);
 ref_diff_rate_list=zeros(iter_num*temp_num,1);
-ave_tau_list=zeros(iter_num*temp_num,1);
+ave_tau_list=zeros(iter_num*temp_num,length(label_tau_list));
 
 choice_parameter;
 change_prob=change_prob_num/cell_num^2;
 [target_func,norm_value]=choice_irradiation;
 data_parameter;
-%ÉtÉHÉãÉ_ÇÃçÏê¨
-%folder_name=strcat('Parameter_',num2str(sum(quantum_type_number)),'type_',num2str(quantum_number),'num_',num2str(square_distance),'nm_gauss_',num2str(gauss_fix),'_dalay_',delay_point);
 
 mkdir(folder_name)
 mkdir(strcat(folder_name,'/Qdot_plot'))
@@ -54,20 +63,36 @@ for tm_num=1:temp_num
             end
         end
         
-        [fluorescence_result,QD_type_seq]=Geneate_signal_component(folder_name,target_func,ref_diff_rate,count,QD_type_seq);
-        [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
-        check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
+        plot_num=round(time_scale/time_span+1);
+        Irr=convert_pulse_square(target_func);
         
-        
-        % close all
-        fix_time=time(max_position_flu:end)-max_position_flu*time_span;
+        [networkSys,~,position_value]=Generate_Q_net(count,QD_type_seq,cell_num,fluorescence_lifetime,...
+            Qdot_eff,qd_size,quantum_type_number,...
+            folder_name,refrac,kai2,Na);
+        if gauss_fix==1
+            sigma2=(FWHM/(2*sqrt(2*log(2))))^2*eye(2);
+            mu=square_distance/2*ones(1,2);
+            norm_dist_fix_param=mvnpdf(position_value,mu,sigma2);
+            norm_dist_fix_param=norm_dist_fix_param./mvnpdf(mu,mu,sigma2);
+            Irr_fix=Irr*transpose(norm_dist_fix_param);
+        else
+            Irr_fix=Irr*ones(1,cell_num^2);
+        end
+        for WL_num=1:length(irr_wavelength)
+            irr_wavelength=irr_wavelength_list(WL_num);
+            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength);
+            [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
+            check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
+            fix_time=time(max_position_flu:end)-max_position_flu*time_span;
+            fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp1','Lower',[0,-Inf],'Upper',[10,0]);
+            WL_tau_list(WL_num)=-1/fit_result.b;
+                    % fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp2','Lower',[0,-Inf,0,-Inf],'Upper',[10,0,10,0]);
+                    % average_tau=(fit_result.a*(-1/fit_result.b)^2+fit_result.c*(-1/fit_result.d)^2)/(fit_result.a*(-1/fit_result.b)+fit_result.c*(-1/fit_result.d))*2;
+        end
+
         % plot(fix_time,check_fluorescence_signal)
         %%
-        fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp1','Lower',[0,-Inf],'Upper',[10,0]);
-        % fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp2','Lower',[0,-Inf,0,-Inf],'Upper',[10,0,10,0]);
-        % average_tau=(fit_result.a*(-1/fit_result.b)^2+fit_result.c*(-1/fit_result.d)^2)/(fit_result.a*(-1/fit_result.b)+fit_result.c*(-1/fit_result.d))*2;
-        average_tau=-1/fit_result.b*2;
-        diff_rate=abs((average_tau-label_tau_value)/label_tau_value);
+        diff_rate=sum(abs(WL_tau_list-label_tau_list))/mean(label_tau_list);
         
         if diff_rate<ref_diff_rate
             ref_diff_rate=diff_rate;
@@ -78,7 +103,7 @@ for tm_num=1:temp_num
             
             saveas(gcf,fig_name)
         else
-            proba=exp(-(diff_rate-ref_diff_rate)/temp_list(tm_num))
+            proba=exp(-(diff_rate-ref_diff_rate)/temp_list(tm_num));
             if proba>rand(1)
                 ref_diff_rate=diff_rate;
                 ref_QD_type_seq=QD_type_seq;
@@ -120,11 +145,11 @@ for tm_num=1:temp_num
                 ylim([0,square_distance])
                 title(strcat('Iteration: ',num2str(count)))
                 fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-                saveas(fig,fig_name)  
+                saveas(fig,fig_name)
             end
             
         end
-        ave_tau_list(count)=average_tau;
+        ave_tau_list(count,:)=WL_tau_list;
         diff_rate_list(count)=diff_rate;
         ref_diff_rate_list(count)=ref_diff_rate;
         
@@ -143,7 +168,7 @@ ylabel('Loss function')
 xlabel('Iteration')
 set(gca,'FontSize',16)
 saveas(gca,strcat(folder_name,'/loss_function.fig'))
-[~,min_QD_net_num]=min(diff_rate_list)
+[~,min_QD_net_num]=min(diff_rate_list);
 
 
 save(strcat(folder_name,'/choice_parameter.mat'),...

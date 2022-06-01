@@ -1,4 +1,4 @@
-function [fluorescence_result,previous_Energy_list]=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys)
+function [fluorescence_result,previous_Energy_list]=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys,irr_wavelength)
 choice_parameter;
 data_parameter;
 %%
@@ -14,7 +14,7 @@ excited_QD_number_list=zeros(plot_num,cell_num^2);
 
 %radiation speed, of absorbtion cross ssection, of satuation
 %energy, of quantum efficiency and fluorescence lifetime of QDs.
-[rad_speed,abs_matrix,sat_energy_matrix,fluorescence_lifetime_matrix,energy_spectrum_list,N_total_list]=set_QD_param(Q_type_seq,networkSys);
+[rad_speed,abs_matrix,sat_energy_matrix,fluorescence_lifetime_matrix,energy_spectrum_list,N_total_list]=set_QD_param(Q_type_seq,networkSys,irr_wavelength);
 
 %%
 for i=1:plot_num
