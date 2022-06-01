@@ -3,9 +3,9 @@ clear all
 folder_name=strcat('Result/',datestr(datetime('now')));
 %%
 %%%%
-label_tau_list=[0.1857; 0.1610; 0.2990]*10^-9;
-% label_tau_value=[0.4871 0.8282 0.5770]*10^-9;
-% label_tau_value=[0.9302 0.4190 0.6792]*10^-9;
+% label_tau_list=[0.1857; 0.1610; 0.2990]*10^-9;
+label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
+% label_tau_list=[0.9302 0.4190 0.6792]*10^-9;
 
 ref_diff_rate=100;
 diff_rate=100;
@@ -18,7 +18,7 @@ ini_temp=5*10^-2;
 ini_list=0:1:temp_num-1;
 irr_wavelength_list=[400 425 450]*10^-9;
 irr_wavelength=irr_wavelength_list(1);
-WL_tau_list=zeros(length(irr_wavelength_list),1);
+WL_tau_list=zeros(1,length(irr_wavelength_list));
 
 temp_list=ini_temp*temp_dec_rate.^ini_list;
 

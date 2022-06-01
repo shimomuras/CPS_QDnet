@@ -26,7 +26,7 @@ QD_wavelength=[550,600,0]*10^-9;
 quantum_type_number=[1,1,1];
 
 %number of QD in network [number]
-cell_num=3;
+cell_num=10;
 
 
 
