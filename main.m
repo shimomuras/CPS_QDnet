@@ -3,15 +3,17 @@ clear all
 folder_name=strcat('Result/',datestr(datetime('now'),'yyyymmdd/HHMM'));
 %%
 %%%%
-% label_tau_list=[0.1857; 0.1610; 0.2990]*10^-9;
-label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
+label_tau_list=[0.1857 0.1610 0.2990]*10^-9;
+% label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
 % label_tau_list=[0.9302 0.4190 0.6792]*10^-9;
+
+choice_processor='CPU';
 
 ref_diff_rate=100;
 diff_rate=100;
 rate_amp=10;
-iter_num=5;
-temp_num=5;
+iter_num=100;
+temp_num=10;
 change_prob_num=10;
 temp_dec_rate=0.9;
 ini_temp=5*10^-2;
@@ -20,12 +22,14 @@ irr_wavelength_list=[400 425 450]*10^-9;
 irr_wavelength=irr_wavelength_list(1);
 WL_tau_list=zeros(1,length(irr_wavelength_list));
 
+
 temp_list=ini_temp*temp_dec_rate.^ini_list;
 
 
 diff_rate_list=zeros(iter_num*temp_num,1);
 ref_diff_rate_list=zeros(iter_num*temp_num,1);
 ave_tau_list=zeros(iter_num*temp_num,length(label_tau_list));
+ref_num_list=zeros(iter_num*temp_num,1);
 
 choice_parameter;
 change_prob=change_prob_num/cell_num^2;
@@ -80,10 +84,12 @@ for tm_num=1:temp_num
         end
         for WL_num=1:length(irr_wavelength)
             irr_wavelength=irr_wavelength_list(WL_num);
-            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength);
+            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength,choice_processor);
             [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
             check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
             fix_time=time(max_position_flu:end)-max_position_flu*time_span;
+            
+            
             fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp1','Lower',[0,-Inf],'Upper',[10,0]);
             WL_tau_list(WL_num)=-1/fit_result.b;
                     % fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp2','Lower',[0,-Inf,0,-Inf],'Upper',[10,0,10,0]);
@@ -98,8 +104,8 @@ for tm_num=1:temp_num
             ref_diff_rate=diff_rate;
             ref_QD_type_seq=QD_type_seq;
             ref_num=count;
-            title(strcat('Iteration: ',num2str(count)))
-            fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
+%             title(strcat('Iteration: ',num2str(count)))
+%             fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
             
             saveas(gcf,fig_name)
         else
@@ -108,47 +114,48 @@ for tm_num=1:temp_num
                 ref_diff_rate=diff_rate;
                 ref_QD_type_seq=QD_type_seq;
                 ref_num=count;
-                title(strcat('Iteration: ',num2str(count)))
-                fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-                saveas(gcf,fig_name)
+%                 title(strcat('Iteration: ',num2str(count)))
+%                 fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
+%                 saveas(gcf,fig_name)
             else
-                
-                calib_scale=72/96;
-                load(strcat(folder_name,'/QD_posi_',num2str(ref_num),'.mat'))
-                %windows
-                % calib_scale=1;
-                clf
-                square_distance=qd_size*(cell_num+1);
-                fig=gcf;
-                fig.Units='points';
-                fig.InnerPosition=[100 100 400 400];
-                sz=(qd_size/2*450/square_distance*calib_scale)^2*pi;
-                
-                
-                for i=1:length(Q_type_seq)
-                    if Q_type_seq(i)==1
-                        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','b','MarkerEdgeColor','b')
-                    elseif Q_type_seq(i)==2
-                        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','g','MarkerEdgeColor','g')
-                    elseif Q_type_seq(i)==3
-                        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','None','MarkerEdgeColor','None')
-                    end
-                    if i~=length(Q_type_seq)
-                        hold on
-                    end
-                end
-                %
-                xlabel('Posiiton [nm]')
-                ylabel('Posiiton [nm]')
-                
-                xlim([0,square_distance])
-                ylim([0,square_distance])
-                title(strcat('Iteration: ',num2str(count)))
-                fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-                saveas(fig,fig_name)
+%                 
+%                 calib_scale=72/96;
+%                 load(strcat(folder_name,'/QD_posi_',num2str(ref_num),'.mat'))
+%                 %windows
+%               %  calib_scale=1;
+%                 clf
+%                 square_distance=qd_size*(cell_num+1);
+%                 fig=gcf;
+%                 fig.Units='points';
+%                 fig.InnerPosition=[100 100 400 400];
+%                 sz=(qd_size/2*450/square_distance*calib_scale)^2*pi;
+%                 
+%                 
+%                 for i=1:length(Q_type_seq)
+%                     if Q_type_seq(i)==1
+%                         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','b','MarkerEdgeColor','b')
+%                     elseif Q_type_seq(i)==2
+%                         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','g','MarkerEdgeColor','g')
+%                     elseif Q_type_seq(i)==3
+%                         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','None','MarkerEdgeColor','None')
+%                     end
+%                     if i~=length(Q_type_seq)
+%                         hold on
+%                     end
+%                 end
+%                 %
+%                 xlabel('Posiiton [nm]')
+%                 ylabel('Posiiton [nm]')
+%                 
+%                 xlim([0,square_distance])
+%                 ylim([0,square_distance])
+%                 title(strcat('Iteration: ',num2str(count)))
+%                 fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
+%                 saveas(fig,fig_name)
             end
             
         end
+        ref_num_list(count)=ref_num;
         ave_tau_list(count,:)=WL_tau_list;
         diff_rate_list(count)=diff_rate;
         ref_diff_rate_list(count)=ref_diff_rate;
@@ -158,7 +165,7 @@ for tm_num=1:temp_num
         % diff_rate=ref_diff_rate*rate_amp;
     end
 end
-save(strcat(folder_name,'/result.mat'),'ave_tau_list','diff_rate_list','ref_diff_rate_list','label_tau_list')
+save(strcat(folder_name,'/result.mat'),'ave_tau_list','diff_rate_list','ref_diff_rate_list','label_tau_list','ref_num_list')
 
 %%
 close all

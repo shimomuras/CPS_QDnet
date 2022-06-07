@@ -1,15 +1,22 @@
-function [fluorescence_result,previous_Energy_list]=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys,irr_wavelength)
+function [fluorescence_result,previous_Energy_list]=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys,irr_wavelength,choice_processor)
 choice_parameter;
 data_parameter;
 %%
 % %initialize
 QD_type_number=length(quantum_type_number);
 
-excited_QD_number=zeros(1,cell_num^2);
-fluorescence_qd_sum_wavelength=zeros(1,QD_type_number);
-fluorescence_total=zeros(length(quantum_type_number),1);
-fluorescence_result=zeros(plot_num,QD_type_number+1);
-excited_QD_number_list=zeros(plot_num,cell_num^2);
+if strcmp(choice_processor,'CPU')
+    excited_QD_number=zeros(1,cell_num^2);
+elseif strcmp(choice_processor,'GPU')
+    excited_QD_number=gpuArray(zeros(1,cell_num^2));    
+    networkSys=gpuArray(networkSys);
+else
+    error('invalid processor!')
+end
+    fluorescence_qd_sum_wavelength=zeros(1,QD_type_number);
+    fluorescence_total=zeros(length(quantum_type_number),1);
+    fluorescence_result=zeros(plot_num,QD_type_number+1);
+    excited_QD_number_list=zeros(plot_num,cell_num^2);
 %%
 
 %radiation speed, of absorbtion cross ssection, of satuation
@@ -18,7 +25,7 @@ excited_QD_number_list=zeros(plot_num,cell_num^2);
 
 %%
 for i=1:plot_num
-    
+    disp(i)
     Input=Irr_fix(i,:);
     first_term=-1./fluorescence_lifetime_matrix.*excited_QD_number;
     for check_term=1:length(first_term)

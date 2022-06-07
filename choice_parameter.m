@@ -5,7 +5,7 @@ time_span=1*10^-12;
 
 time_step=1*10^-9;
 
-total_data_num=20;
+total_data_num=2;
 
 time_scale=time_step*total_data_num;
 
@@ -26,7 +26,7 @@ QD_wavelength=[550,600,0]*10^-9;
 quantum_type_number=[1,1,1];
 
 %number of QD in network [number]
-cell_num=10;
+cell_num=50;
 
 
 
