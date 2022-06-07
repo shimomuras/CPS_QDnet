@@ -25,7 +25,7 @@ end
 
 %%
 for i=1:plot_num
-    disp(i)
+%     disp(i)
     Input=Irr_fix(i,:);
     first_term=-1./fluorescence_lifetime_matrix.*excited_QD_number;
     for check_term=1:length(first_term)

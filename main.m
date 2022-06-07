@@ -12,7 +12,7 @@ choice_processor='CPU';
 ref_diff_rate=100;
 diff_rate=100;
 rate_amp=10;
-iter_num=100;
+iter_num=10;
 temp_num=10;
 change_prob_num=10;
 temp_dec_rate=0.9;
@@ -56,10 +56,14 @@ end
 ref_QD_type_seq=QD_type_seq;
 count=0;
 ref_num=0;
+
+[Generated_qd_distance, position_value]=distance_matrix_fix(cell_num,qd_size);
+save(strcat(folder_name,'/cell_distance_list.mat'),'Generated_qd_distance','position_value')
+
 for tm_num=1:temp_num
     for it_num=1:iter_num
         count=count+1;
-        
+%         disp(count);
         while true
             QD_type_seq=QD_type_definition(ref_QD_type_seq,change_prob,quantum_type_number);
             if sum(QD_type_seq)~=3*cell_num.^2
@@ -67,12 +71,13 @@ for tm_num=1:temp_num
             end
         end
         
+        save(strcat(folder_name,'/QD_type_',num2str(count),'.mat'),'QD_type_seq')
+
         plot_num=round(time_scale/time_span+1);
         Irr=convert_pulse_square(target_func);
         
-        [networkSys,~,position_value]=Generate_Q_net(count,QD_type_seq,cell_num,fluorescence_lifetime,...
-            Qdot_eff,qd_size,quantum_type_number,...
-            folder_name,refrac,kai2,Na);
+        networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,...
+            Qdot_eff,refrac,kai2,Na);
         if gauss_fix==1
             sigma2=(FWHM/(2*sqrt(2*log(2))))^2*eye(2);
             mu=square_distance/2*ones(1,2);
@@ -104,54 +109,12 @@ for tm_num=1:temp_num
             ref_diff_rate=diff_rate;
             ref_QD_type_seq=QD_type_seq;
             ref_num=count;
-%             title(strcat('Iteration: ',num2str(count)))
-%             fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-            
-            saveas(gcf,fig_name)
         else
             proba=exp(-(diff_rate-ref_diff_rate)/temp_list(tm_num));
             if proba>rand(1)
                 ref_diff_rate=diff_rate;
                 ref_QD_type_seq=QD_type_seq;
-                ref_num=count;
-%                 title(strcat('Iteration: ',num2str(count)))
-%                 fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-%                 saveas(gcf,fig_name)
-            else
-%                 
-%                 calib_scale=72/96;
-%                 load(strcat(folder_name,'/QD_posi_',num2str(ref_num),'.mat'))
-%                 %windows
-%               %  calib_scale=1;
-%                 clf
-%                 square_distance=qd_size*(cell_num+1);
-%                 fig=gcf;
-%                 fig.Units='points';
-%                 fig.InnerPosition=[100 100 400 400];
-%                 sz=(qd_size/2*450/square_distance*calib_scale)^2*pi;
-%                 
-%                 
-%                 for i=1:length(Q_type_seq)
-%                     if Q_type_seq(i)==1
-%                         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','b','MarkerEdgeColor','b')
-%                     elseif Q_type_seq(i)==2
-%                         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','g','MarkerEdgeColor','g')
-%                     elseif Q_type_seq(i)==3
-%                         scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','None','MarkerEdgeColor','None')
-%                     end
-%                     if i~=length(Q_type_seq)
-%                         hold on
-%                     end
-%                 end
-%                 %
-%                 xlabel('Posiiton [nm]')
-%                 ylabel('Posiiton [nm]')
-%                 
-%                 xlim([0,square_distance])
-%                 ylim([0,square_distance])
-%                 title(strcat('Iteration: ',num2str(count)))
-%                 fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-%                 saveas(fig,fig_name)
+                ref_num=count;     
             end
             
         end
@@ -183,4 +146,4 @@ saveas(gca,strcat(folder_name,'/loss_function.fig'))
 
 
 save(strcat(folder_name,'/choice_parameter.mat'),...
-    'diff_rate_list','time_step','time_span','time_scale','cell_num','irr_wavelength','square_distance','Initial_Input','iter_num','rate_amp','min_QD_net_num');
+    'diff_rate_list','time_step','time_span','time_scale','cell_num','irr_wavelength','square_distance','Initial_Input','iter_num','rate_amp','min_QD_net_num','qd_size');
