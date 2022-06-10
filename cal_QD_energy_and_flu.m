@@ -72,7 +72,7 @@ end
 
 fluorescence=time_span*rad_speed.*excited_QD_number.*energy_spectrum_list;
 
-result_QD_number=excited_QD_number+time_span.*first_term+check_cal_value;
+result_QD_number=excited_QD_number+check_cal_value;
 %     if result_QD_number>N_total_list*0.9
 %         disp('beep')
 %     end
