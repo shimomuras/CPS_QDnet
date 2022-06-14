@@ -34,10 +34,8 @@ cell_num=10;
 % irr_wavelength=400*10^-9;
 
 %netowork size [nm^2]
-square_distance=100;
+square_distance=10;
 
-%number of node (number of QD network) [number]
-Q_number=1;
 
 
 %Irradiation type
@@ -75,7 +73,7 @@ Rep_freq=1000;
 sat_intensity=2.8*10^6;
 
  
-Initial_Input=2.8*10^3;
+Initial_Input=5.7;
 
 Intensity_amp=log10(Initial_Input/sat_intensity);%[W/cm^2]
 %Intensity/Rep_freq/time_integral;

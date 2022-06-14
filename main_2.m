@@ -7,20 +7,24 @@ folder_name=strcat('Result/',datestr(datetime('now'),'yyyymmdd/HHMM'));
 % label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
 label_tau_list=[4.3052 2.7562]*10^-9;
 
+test_irr_wavelength=450*10^-9;
+true_tau=8.4406;
+
+choice_processor='CPU';
+
 ref_diff_rate=100;
 diff_rate=100;
-rate_amp=1;
-iter_num=50;
-temp_num=8;
-change_prob_num=5;
+rate_amp=10;
+iter_num=10;
+temp_num=10;
+change_prob_num=10;
 temp_dec_rate=0.9;
-ini_temp=1*10^-11;
+ini_temp=5*10^-2;
 ini_list=0:1:temp_num-1;
 irr_wavelength_list=[425 450]*10^-9;
 irr_wavelength=irr_wavelength_list(1);
 WL_tau_list=zeros(1,length(irr_wavelength_list));
-test_irr_wavelength=450*10^-9;
-true_tau=8.4406;
+
 
 temp_list=ini_temp*temp_dec_rate.^ini_list;
 
@@ -28,6 +32,7 @@ temp_list=ini_temp*temp_dec_rate.^ini_list;
 diff_rate_list=zeros(iter_num*temp_num,1);
 ref_diff_rate_list=zeros(iter_num*temp_num,1);
 ave_tau_list=zeros(iter_num*temp_num,length(label_tau_list));
+ref_num_list=zeros(iter_num*temp_num,1);
 
 choice_parameter;
 change_prob=change_prob_num/cell_num^2;
@@ -54,6 +59,10 @@ end
 ref_QD_type_seq=QD_type_seq;
 count=0;
 ref_num=0;
+
+[Generated_qd_distance, position_value]=distance_matrix_fix(cell_num,qd_size);
+save(strcat(folder_name,'/cell_distance_list.mat'),'Generated_qd_distance','position_value')
+
 for tm_num=1:temp_num
     for it_num=1:iter_num
         count=count+1;
@@ -65,12 +74,13 @@ for tm_num=1:temp_num
             end
         end
         
+        save(strcat(folder_name,'/QD_type_',num2str(count),'.mat'),'QD_type_seq')
+        
         plot_num=round(time_scale/time_span+1);
         Irr=convert_pulse_square(target_func);
         
-        [networkSys,~,position_value]=Generate_Q_net(count,QD_type_seq,cell_num,fluorescence_lifetime,...
-            Qdot_eff,qd_size,quantum_type_number,...
-            folder_name,refrac,kai2,Na);
+        networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,...
+            Qdot_eff,refrac,kai2,Na);
         
         if gauss_fix==1
             sigma2=(FWHM/(2*sqrt(2*log(2))))^2*eye(2);
@@ -81,18 +91,19 @@ for tm_num=1:temp_num
         else
             Irr_fix=Irr*ones(1,cell_num^2);
         end
+        
         for WL_num=1:length(irr_wavelength)
             irr_wavelength=irr_wavelength_list(WL_num);
-            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength);
+            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength,choice_processor);
             [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
             check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
             fix_time=time(max_position_flu:end)-max_position_flu*time_span;
             fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp1','Lower',[0,-Inf],'Upper',[10,0]);
             WL_tau_list(WL_num)=-1/fit_result.b;
-                    % fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp2','Lower',[0,-Inf,0,-Inf],'Upper',[10,0,10,0]);
-                    % average_tau=(fit_result.a*(-1/fit_result.b)^2+fit_result.c*(-1/fit_result.d)^2)/(fit_result.a*(-1/fit_result.b)+fit_result.c*(-1/fit_result.d))*2;
+            % fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp2','Lower',[0,-Inf,0,-Inf],'Upper',[10,0,10,0]);
+            % average_tau=(fit_result.a*(-1/fit_result.b)^2+fit_result.c*(-1/fit_result.d)^2)/(fit_result.a*(-1/fit_result.b)+fit_result.c*(-1/fit_result.d))*2;
         end
-
+        
         % plot(fix_time,check_fluorescence_signal)
         %%
         diff_rate=sum((WL_tau_list-label_tau_list).^2)/(std(label_tau_list)*length(label_tau_list));
@@ -101,66 +112,31 @@ for tm_num=1:temp_num
             ref_diff_rate=diff_rate;
             ref_QD_type_seq=QD_type_seq;
             ref_num=count;
-            title(strcat('Iteration: ',num2str(count)))
-            fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-            
-            saveas(gcf,fig_name)
         else
-            proba=exp(-(diff_rate-ref_diff_rate)/temp_list(tm_num))
+            proba=exp(-(diff_rate-ref_diff_rate)/temp_list(tm_num));
             if proba>rand(1)
                 ref_diff_rate=diff_rate;
                 ref_QD_type_seq=QD_type_seq;
                 ref_num=count;
-                title(strcat('Iteration: ',num2str(count)))
-                fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-                saveas(gcf,fig_name)
-            else
-                
-                calib_scale=72/96;
-                load(strcat(folder_name,'/QD_posi_',num2str(ref_num),'.mat'))
-                %windows
-                % calib_scale=1;
-                clf
-                square_distance=qd_size*(cell_num+1);
-                fig=gcf;
-                fig.Units='points';
-                fig.InnerPosition=[100 100 400 400];
-                sz=(qd_size/2*450/square_distance*calib_scale)^2*pi;
-                
-                
-                for i=1:length(Q_type_seq)
-                    if Q_type_seq(i)==1
-                        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','b','MarkerEdgeColor','b')
-                    elseif Q_type_seq(i)==2
-                        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','g','MarkerEdgeColor','g')
-                    elseif Q_type_seq(i)==3
-                        scatter(position_value(i,1),position_value(i,2),sz,'MarkerFaceColor','None','MarkerEdgeColor','None')
-                    end
-                    if i~=length(Q_type_seq)
-                        hold on
-                    end
-                end
-                %
-                xlabel('Posiiton [nm]')
-                ylabel('Posiiton [nm]')
-                
-                xlim([0,square_distance])
-                ylim([0,square_distance])
-                title(strcat('Iteration: ',num2str(count)))
-                fig_name=strcat(folder_name,'/ref_Qdot_plot/graph_',num2str(count),'.jpg');
-                saveas(fig,fig_name)
             end
             
         end
+        ref_num_list(count)=ref_num;
         ave_tau_list(count,:)=WL_tau_list;
         diff_rate_list(count)=diff_rate;
         ref_diff_rate_list(count)=ref_diff_rate;
         
         
-        
-        % diff_rate=ref_diff_rate*rate_amp;
     end
+    ave_tau_list(count,:)=WL_tau_list;
+    diff_rate_list(count)=diff_rate;
+    ref_diff_rate_list(count)=ref_diff_rate;
+    
+    
+    
+    % diff_rate=ref_diff_rate*rate_amp;
 end
+
 save(strcat(folder_name,'/result.mat'),'ave_tau_list','diff_rate_list','ref_diff_rate_list')
 
 %%
@@ -182,9 +158,9 @@ save(strcat(folder_name,'/choice_parameter.mat'),...
 
 %%
 %test
-load(strcat(folder_name,'/QD_posi_',num2str(min_QD_net_num),'.mat'))
-
-[fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,test_irr_wavelength);
+load(strcat(folder_name,'/QD_type_',num2str(min_QD_net_num),'.mat'))
+networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,Qdot_eff,refrac,kai2,Na);
+[fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,test_irr_wavelength,choice_processor);
 [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
 check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
 fix_time=time(max_position_flu:end)-max_position_flu*time_span;

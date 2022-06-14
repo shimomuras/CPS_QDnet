@@ -89,12 +89,10 @@ for tm_num=1:temp_num
         end
         for WL_num=1:length(irr_wavelength)
             irr_wavelength=irr_wavelength_list(WL_num);
-            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength,choice_processor);
+            [fluorescence_result,~]=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength);
             [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
             check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
-            fix_time=time(max_position_flu:end)-max_position_flu*time_span;
-            
-            
+            fix_time=time(max_position_flu:end)-max_position_flu*time_span;            
             fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp1','Lower',[0,-Inf],'Upper',[10,0]);
             WL_tau_list(WL_num)=-1/fit_result.b;
                     % fit_result=fit(transpose(fix_time),check_fluorescence_signal,'exp2','Lower',[0,-Inf,0,-Inf],'Upper',[10,0,10,0]);
