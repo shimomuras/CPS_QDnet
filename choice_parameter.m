@@ -1,20 +1,22 @@
 %time span at simulation [s]
-time_span=1*10^-12;
+time_span=5.959*10^-12;
+
 %total time[s]
 
+% 
+% time_step=1*10^-9;
 
-time_step=1*10^-9;
 
-total_data_num=2;
+total_data_num=1000;
 
-time_scale=time_step*total_data_num;
+time_scale=time_span*total_data_num;
 
 
 ns=10^9;
-show_time_step=strcat(num2str(time_step*ns),'ns');
+% show_time_step=strcat(num2str(time_step*ns),'ns');
 
 %aviable detection time [s]
-detect_time_step=time_step;
+% detect_time_step=time_step;
 
 %total_time_step
 time=0:time_span:time_scale;
@@ -26,7 +28,7 @@ QD_wavelength=[550,600,0]*10^-9;
 quantum_type_number=[1,1,1];
 
 %number of QD in network [number]
-cell_num=10;
+cell_num=3;
 
 
 
@@ -34,7 +36,7 @@ cell_num=10;
 % irr_wavelength=400*10^-9;
 
 %netowork size [nm^2]
-square_distance=10;
+% square_distance=10;
 
 
 
@@ -99,6 +101,6 @@ FRET_implementation='on';
 
 
 
-
-scattering_method='gauss';
-scattering_param=square_distance/2;
+% 
+% scattering_method='gauss';
+% scattering_param=square_distance/2;

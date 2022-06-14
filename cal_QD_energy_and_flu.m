@@ -1,4 +1,4 @@
-function [fluorescence_result,previous_Energy_list]=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys,irr_wavelength,choice_processor)
+function fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,Q_type_seq,networkSys,irr_wavelength,choice_processor)
 choice_parameter;
 data_parameter;
 %%
@@ -128,4 +128,4 @@ end
 
 fluorescence_all=fluorescence_result(:,1)+fluorescence_result(:,2);
 fluorescence_result(:,QD_type_number+1)=fluorescence_all;
-previous_Energy_list=excited_QD_number_list(end-int16(time_step/(2*time_span)),:);
+%previous_Energy_list=excited_QD_number_list(end-int16(time_step/(2*time_span)),:);
