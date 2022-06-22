@@ -7,7 +7,7 @@ folder_name=strcat('Result/',datestr(datetime('now'),'yyyymmdd/HHMM'));
 % label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
 label_tau_list=[4.3052 2.7562]*10^-9;
 
-test_irr_wavelength=450*10^-9;
+test_irr_wavelength=400*10^-9;
 true_tau=8.4406;
 
 choice_processor='CPU';

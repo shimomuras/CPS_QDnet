@@ -1,6 +1,13 @@
 function [distance_value, position_value]=distance_matrix_fix(cell_num,qd_size)
 %folder_name,Q_type_seq,it_num)
 
+% clear all
+% close all
+
+% cell_num=5;
+% qd_size=6.9;
+
+
 position_value=zeros(cell_num^2,2);
 for i=1:cell_num^2
     position_value(i,1)=mod(i-1,cell_num);

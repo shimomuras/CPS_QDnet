@@ -5,46 +5,21 @@ choice_parameter;
 %%
 %%%%
 data_No=1;
-test_wavelength=450;
+test_wavelength=400;
+test_irr_wavelength=test_wavelength*10^-9;
 
 [ref_signal,test_signal,irr_wavelength_list]=load_decay_data(data_No,test_wavelength,total_data_num);
 
 
-
-% label_tau_list=[0.1857; 0.1610; 0.2990]*10^-9;
-% label_tau_list=[0.4871 0.8282 0.5770]*10^-9;
-% label_tau_list=[4.3052 2.7562]*10^-9;
-
-
-
-
-
-
-test_irr_wavelength=test_wavelength*10^-9;
-
-
-choice_processor='CPU';
-
-ref_diff_rate=100;
-diff_rate=100;
-rate_amp=10;
-iter_num=1;
-temp_num=100;
-change_prob_num=10;
-temp_dec_rate=0.9;
-ini_temp=5*10^-2;
-ini_list=0:1:temp_num-1;
-% irr_wavelength_list=[425 450]*10^-9;
+%%%%%%%%%%initialize%%%%%%%%%%%
+ref_loss_value=100;
 MSE_list=zeros(1,length(irr_wavelength_list));
-irr_wavelength=400*10^-9;
-
-temp_list=ini_temp*temp_dec_rate.^ini_list;
-
-
-diff_rate_list=zeros(iter_num*temp_num,1);
-ref_diff_rate_list=zeros(iter_num*temp_num,1);
+loss_value_list=zeros(iter_num*temp_num,1);
+min_loss_value_list=zeros(iter_num*temp_num,1);
 ave_MSE_list=zeros(iter_num*temp_num,length(irr_wavelength_list));
 ref_num_list=zeros(iter_num*temp_num,1);
+irr_wavelength=400*10^-9;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 change_prob=change_prob_num/cell_num^2;
 [target_func,norm_value]=choice_irradiation;
@@ -71,7 +46,12 @@ ref_QD_type_seq=QD_type_seq;
 count=0;
 ref_num=0;
 
-[Generated_qd_distance, position_value]=distance_matrix_fix(cell_num,qd_size);
+if dimension==2
+    [Generated_qd_distance, position_value]=distance_matrix_fix(cell_num,qd_size);
+elseif dimension==3
+    [Generated_qd_distance, position_value]=distance_matrix_fix3D(cell_num,qd_size);
+end
+
 save(strcat(folder_name,'/cell_distance_list.mat'),'Generated_qd_distance','position_value')
 
 for tm_num=1:temp_num
@@ -123,16 +103,16 @@ for tm_num=1:temp_num
 
 
 
-        diff_rate=mean(MSE_list);
+        loss_value=mean(MSE_list);
         
-        if diff_rate<ref_diff_rate
-            ref_diff_rate=diff_rate;
+        if loss_value<ref_loss_value
+            ref_loss_value=loss_value;
             ref_QD_type_seq=QD_type_seq;
             ref_num=count;
         else
-            proba=exp(-(diff_rate-ref_diff_rate)/temp_list(tm_num));
+            proba=exp(-(loss_value-ref_loss_value)/temp_list(tm_num));
             if proba>rand(1)
-                ref_diff_rate=diff_rate;
+                ref_loss_value=loss_value;
                 ref_QD_type_seq=QD_type_seq;
                 ref_num=count;
             end
@@ -140,14 +120,14 @@ for tm_num=1:temp_num
         end
         ref_num_list(count)=ref_num;
         ave_MSE_list(count,:)=MSE_list;
-        diff_rate_list(count)=diff_rate;
-        ref_diff_rate_list(count)=ref_diff_rate;
+        loss_value_list(count)=loss_value;
+        min_loss_value_list(count)=ref_loss_value;
         
         
     end
     ave_MSE_list(count,:)=MSE_list;
-    diff_rate_list(count)=diff_rate;
-    ref_diff_rate_list(count)=ref_diff_rate;
+    loss_value_list(count)=loss_value;
+    min_loss_value_list(count)=ref_loss_value;
     
     
     
@@ -157,7 +137,6 @@ end
 
 
 
-save(strcat(folder_name,'/result.mat'),'ave_MSE_list','diff_rate_list','ref_diff_rate_list')
 
 
 
@@ -165,27 +144,27 @@ save(strcat(folder_name,'/result.mat'),'ave_MSE_list','diff_rate_list','ref_diff
 close all
 % fig1=figure
 subplot(1,4,1)
-plot(ref_diff_rate_list)
-% ylim([0 .1])
+plot(min_loss_value_list)
 ylabel('Loss function')
 xlabel('Iteration')
 set(gca,'FontSize',16)
-saveas(gca,strcat(folder_name,'/loss_function.fig'))
 
 
-[~,min_QD_net_num]=min(diff_rate_list);
 
-save(strcat(folder_name,'/choice_parameter.mat'),...
-    'diff_rate_list','time_span','total_data_num','cell_num','irr_wavelength','Initial_Input','iter_num','rate_amp','min_QD_net_num');
-
+[~,min_QD_net_num]=min(loss_value_list);
+%%
+save(strcat(folder_name,'/train_data.mat'),...
+    'ave_MSE_list','test_wavelength','data_No','irr_wavelength_list','ref_signal',...
+    'Initial_Input','iter_num','min_QD_net_num','plot_num','Irr_fix','loss_value_list','min_loss_value_list');
 
 
 %%
 %test
 
-
-
+copyfile("choice_parameter.m",folder_name)
+copyfile("data_parameter.m",folder_name)
 load(strcat(folder_name,'/QD_type_',num2str(min_QD_net_num),'.mat'))
+
 networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,Qdot_eff,refrac,kai2,Na);
 for i=1:length(irr_wavelength_list)
     subplot(1,4,i+1)
@@ -209,7 +188,7 @@ fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSy
 [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
 check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
 
-validation_MSE=ref_diff_rate
+validation_MSE=ref_loss_value;
 test_MSE=immse(test_signal(1:length(check_fluorescence_signal)),check_fluorescence_signal)
 
 component_rate=nnz(QD_type_seq==1)/nnz(QD_type_seq==2)
@@ -225,3 +204,6 @@ title(strcat('Test ',num2str(test_wavelength),'nm'))
 xlabel('Time [ps]')
 ylabel('Fluorescence intensity [a.u.]')
 legend('Smu','Exp')
+saveas(gca,strcat(folder_name,'/loss_and_prediction.fig'))
+save(strcat(folder_name,'/result_prediction.mat'),...
+    'test_MSE','validation_MSE','component_rate');

@@ -1,22 +1,12 @@
 %time span at simulation [s]
 time_span=5.959*10^-12;
 
-%total time[s]
-
-% 
-% time_step=1*10^-9;
-
-
 total_data_num=1000;
 
 time_scale=time_span*total_data_num;
 
 
-ns=10^9;
-% show_time_step=strcat(num2str(time_step*ns),'ns');
 
-%aviable detection time [s]
-% detect_time_step=time_step;
 
 %total_time_step
 time=0:time_span:time_scale;
@@ -31,14 +21,19 @@ quantum_type_number=[1,1,1];
 cell_num=3;
 
 
+%parameter of SA
+iter_num=10;
+temp_num=10; 
+temp_dec_rate=0.9;
+ini_temp=5*10^-4;
+ini_list=0:1:temp_num-1;
+temp_list=ini_temp*temp_dec_rate.^ini_list;
 
-%irradiation wavelength
-% irr_wavelength=400*10^-9;
-
-%netowork size [nm^2]
-% square_distance=10;
+change_prob_num=10;
 
 
+choice_processor='CPU';
+dimension=2;
 
 %Irradiation type
 choice_num=0;
@@ -68,21 +63,15 @@ end
        
 %Input intensity
 
-Rep_freq=1000;
-%Initial_Input=Intensity/Rep_freq;
-%time_integral=2.5324*10^-23;%パルス積�?値
-
-sat_intensity=2.8*10^6;
-
+% sat_intensity=2.8*10^6;
  
 Initial_Input=5.7;
 
-Intensity_amp=log10(Initial_Input/sat_intensity);%[W/cm^2]
-%Intensity/Rep_freq/time_integral;
+
 
 
 %type of weight_in:rand:random weight, arrange: increasing weight in order, none: same weight  
-weight_in_type='none';
+% weight_in_type='none';
 
 
 
@@ -91,16 +80,6 @@ wavelength_choice=2;
 
 
 
-evaluation_method='acc';
-%acc or rmse;
-
-
-
 %implementation of FRET
 FRET_implementation='on';
 
-
-
-% 
-% scattering_method='gauss';
-% scattering_param=square_distance/2;
