@@ -3,10 +3,11 @@ clear all
 folder_name=strcat('Result/',datestr(datetime('now'),'yyyymmdd/HHMM'));
 choice_parameter;
 %%
-%%%%
+
 data_No=1;
 test_wavelength=400;
 test_irr_wavelength=test_wavelength*10^-9;
+
 
 [ref_signal,test_signal,irr_wavelength_list]=load_decay_data(data_No,test_wavelength,total_data_num);
 
@@ -19,6 +20,10 @@ min_loss_value_list=zeros(iter_num*temp_num,1);
 ave_MSE_list=zeros(iter_num*temp_num,length(irr_wavelength_list));
 ref_num_list=zeros(iter_num*temp_num,1);
 irr_wavelength=400*10^-9;
+
+before_Initial_Input=0; 
+preserve_loss_value=0;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 change_prob=change_prob_num/cell_num^2;
@@ -57,7 +62,6 @@ save(strcat(folder_name,'/cell_distance_list.mat'),'Generated_qd_distance','posi
 for tm_num=1:temp_num
     for it_num=1:iter_num
         count=count+1;
-        
         while true
             QD_type_seq=QD_type_definition(ref_QD_type_seq,change_prob,quantum_type_number);
             if sum(QD_type_seq)~=3*cell_num.^2
@@ -68,7 +72,7 @@ for tm_num=1:temp_num
         save(strcat(folder_name,'/QD_type_',num2str(count),'.mat'),'QD_type_seq')
         
         plot_num=round(time_scale/time_span+1);
-        Irr=convert_pulse_square(target_func);
+        Irr=convert_pulse_square(target_func,Initial_Input);
         
         networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,...
             Qdot_eff,refrac,kai2,Na);
@@ -109,21 +113,27 @@ for tm_num=1:temp_num
             ref_loss_value=loss_value;
             ref_QD_type_seq=QD_type_seq;
             ref_num=count;
+            
         else
             proba=exp(-(loss_value-ref_loss_value)/temp_list(tm_num));
             if proba>rand(1)
                 ref_loss_value=loss_value;
                 ref_QD_type_seq=QD_type_seq;
                 ref_num=count;
+                
             end
             
         end
+        
         ref_num_list(count)=ref_num;
         ave_MSE_list(count,:)=MSE_list;
         loss_value_list(count)=loss_value;
         min_loss_value_list(count)=ref_loss_value;
         
         
+        
+        
+       
     end
     ave_MSE_list(count,:)=MSE_list;
     loss_value_list(count)=loss_value;
@@ -133,8 +143,6 @@ for tm_num=1:temp_num
     
     % diff_rate=ref_diff_rate*rate_amp;
 end
-
-
 
 
 

@@ -13,15 +13,15 @@ function [target_func,norm_value]=choice_irradiation
 choice_parameter;
 % data_parameter;
 %
-load('changed_param.mat');
-reduced_time=0:time_step:max(time)-time_step;
-expand_value=time_step/time_span;
+% load('changed_param.mat');
+reduced_time=0:time_span:max(time)-time_span;
+expand_value=1;
 
 
 switch choice_num
     case 0     %テスト波
         Irr=zeros(length(reduced_time),1);
-        Irr(2)=1;
+        Irr(length(reduced_time)/20)=1;
         target_func=transpose(Irr);
         norm_value=max(target_func);
         

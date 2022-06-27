@@ -5,8 +5,7 @@ total_data_num=1000;
 
 time_scale=time_span*total_data_num;
 
-
-
+Initial_Input=10;%[W/cm^2]
 
 %total_time_step
 time=0:time_span:time_scale;
@@ -20,12 +19,11 @@ quantum_type_number=[1,1,1];
 %number of QD in network [number]
 cell_num=3;
 
-
 %parameter of SA
-iter_num=10;
+iter_num=100;
 temp_num=10; 
 temp_dec_rate=0.9;
-ini_temp=5*10^-4;
+ini_temp=5*10^-3;
 ini_list=0:1:temp_num-1;
 temp_list=ini_temp*temp_dec_rate.^ini_list;
 
@@ -65,7 +63,7 @@ end
 
 % sat_intensity=2.8*10^6;
  
-Initial_Input=5.7;
+% Initial_Input=5.7;
 
 
 

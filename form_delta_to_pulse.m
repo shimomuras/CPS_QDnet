@@ -12,7 +12,7 @@ Rep_freq=1*10^4;
 
 total_func_cos=zeros(length(Irr),1);
 
-for i=2:length(Irr)
+for i=1:length(Irr)
     if Irr(i)~=0
         func_cos=Irr(i)*cos(pi*Rep_freq*(time-(i-1)*time_span)).^(2*form_shape);
         total_func_cos=total_func_cos+transpose(func_cos);        

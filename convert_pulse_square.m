@@ -1,9 +1,9 @@
-function Irr=convert_pulse_square(modify_target_func)
+function Irr=convert_pulse_square(modify_target_func,Initial_Input)
 choice_parameter;
-load('changed_param.mat');
+%load('changed_param.mat');
 
-reduced_time=0:time_step:time_scale;
-expand_value=int64(time_step/time_span);
+reduced_time=0:time_span:time_scale;
+expand_value=1;
 
 Irr=zeros(length(time),1);
 
