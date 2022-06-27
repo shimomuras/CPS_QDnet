@@ -19,8 +19,12 @@ quantum_type_number=[1,1,1];
 %number of QD in network [number]
 cell_num=3;
 
+dimension=3;
+
+cell_scale=cell_num.^dimension;
+
 %parameter of SA
-iter_num=100;
+iter_num=10;
 temp_num=10; 
 temp_dec_rate=0.9;
 ini_temp=5*10^-3;
@@ -31,7 +35,7 @@ change_prob_num=10;
 
 
 choice_processor='CPU';
-dimension=2;
+
 
 %Irradiation type
 choice_num=0;

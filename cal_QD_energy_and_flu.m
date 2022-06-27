@@ -6,9 +6,9 @@ data_parameter;
 QD_type_number=length(quantum_type_number);
 
 if strcmp(choice_processor,'CPU')
-    excited_QD_number=zeros(1,cell_num^2);
+    excited_QD_number=zeros(1,cell_scale);
 elseif strcmp(choice_processor,'GPU')
-    excited_QD_number=gpuArray(zeros(1,cell_num^2));    
+    excited_QD_number=gpuArray(zeros(1,cell_scale));    
     networkSys=gpuArray(networkSys);
 else
     error('invalid processor!')
@@ -16,7 +16,7 @@ end
     fluorescence_qd_sum_wavelength=zeros(1,QD_type_number);
     fluorescence_total=zeros(length(quantum_type_number),1);
     fluorescence_result=zeros(plot_num,QD_type_number+1);
-    excited_QD_number_list=zeros(plot_num,cell_num^2);
+    excited_QD_number_list=zeros(plot_num,cell_scale);
 %%
 
 %radiation speed, of absorbtion cross ssection, of satuation
@@ -88,7 +88,7 @@ result_QD_number=excited_QD_number+check_cal_value;
 
 excited_QD_number=result_QD_number;
 excited_QD_number_list(i,:)=excited_QD_number;
-for s=1:cell_num^2
+for s=1:cell_scale
     for t=1:length(quantum_type_number)
         if Q_type_seq(s)==t
             fluorescence_qd_sum_wavelength(t)=fluorescence_qd_sum_wavelength(t)+fluorescence(s);

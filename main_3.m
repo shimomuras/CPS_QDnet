@@ -26,7 +26,7 @@ preserve_loss_value=0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-change_prob=change_prob_num/cell_num^2;
+change_prob=change_prob_num/cell_scale;
 [target_func,norm_value]=choice_irradiation;
 data_parameter;
 
@@ -34,7 +34,7 @@ mkdir(folder_name)
 mkdir(strcat(folder_name,'/Qdot_plot'))
 mkdir(strcat(folder_name,'/ref_Qdot_plot'))
 
-QD_type_seq=randi(length(quantum_type_number),[cell_num^2,1]);
+QD_type_seq=randi(length(quantum_type_number),[cell_scale,1]);
 for i=1:length(QD_type_seq)
     if quantum_type_number(QD_type_seq(i))==0
         while true
@@ -64,7 +64,7 @@ for tm_num=1:temp_num
         count=count+1;
         while true
             QD_type_seq=QD_type_definition(ref_QD_type_seq,change_prob,quantum_type_number);
-            if sum(QD_type_seq)~=3*cell_num.^2
+            if sum(QD_type_seq)~=3*cell_scale
                 break;
             end
         end
@@ -74,7 +74,7 @@ for tm_num=1:temp_num
         plot_num=round(time_scale/time_span+1);
         Irr=convert_pulse_square(target_func,Initial_Input);
         
-        networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,...
+        networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_scale,fluorescence_lifetime,...
             Qdot_eff,refrac,kai2,Na);
         
         if gauss_fix==1
@@ -84,7 +84,7 @@ for tm_num=1:temp_num
             norm_dist_fix_param=norm_dist_fix_param./mvnpdf(mu,mu,sigma2);
             Irr_fix=Irr*transpose(norm_dist_fix_param);
         else
-            Irr_fix=Irr*ones(1,cell_num^2);
+            Irr_fix=Irr*ones(1,cell_scale);
         end
         
         for WL_num=1:length(irr_wavelength)
@@ -173,7 +173,7 @@ copyfile("choice_parameter.m",folder_name)
 copyfile("data_parameter.m",folder_name)
 load(strcat(folder_name,'/QD_type_',num2str(min_QD_net_num),'.mat'))
 
-networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_num,fluorescence_lifetime,Qdot_eff,refrac,kai2,Na);
+networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_scale,fluorescence_lifetime,Qdot_eff,refrac,kai2,Na);
 for i=1:length(irr_wavelength_list)
     subplot(1,4,i+1)
     fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength_list(i),choice_processor);
