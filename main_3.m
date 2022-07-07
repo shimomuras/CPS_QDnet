@@ -9,7 +9,7 @@ test_wavelength=400;
 test_irr_wavelength=test_wavelength*10^-9;
 
 
-[ref_signal,test_signal,irr_wavelength_list]=load_decay_data(data_No,test_wavelength,total_data_num);
+[ref_signal,test_signal,irr_wavelength_list]=load_decay_data(data_No,test_wavelength,ref_total_data_num);
 
 
 %%%%%%%%%%initialize%%%%%%%%%%%
@@ -90,6 +90,7 @@ for tm_num=1:temp_num
         for WL_num=1:length(irr_wavelength)
             irr_wavelength=irr_wavelength_list(WL_num);
             fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength,choice_processor);
+            fluorescence_result=convert_to_ref_time(fluorescence_result,time_span,ref_time_step,length(quantum_type_number));
             [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
             check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
 %             fix_time=time(max_position_flu:end)-max_position_flu*time_span;
@@ -177,8 +178,10 @@ networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_scale,fluoresce
 for i=1:length(irr_wavelength_list)
     subplot(1,4,i+1)
     fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength_list(i),choice_processor);
+    
     [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
     check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
+    
     reference_signal=ref_signal(:,i);
     time=0:time_span:time_span*(length(check_fluorescence_signal)-1);
     time=time*10^12;
