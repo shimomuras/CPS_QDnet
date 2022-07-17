@@ -6,9 +6,9 @@ function total_func_cos=form_delta_to_pulse(Irr,time,time_span)
 
 % time_span=10^-12;
 % time_2=0:time_span:5*10^-9;
-form_shape=5*10^11;
+form_shape=3*10^11;
 Rep_freq=1*10^4;
-%パルス半値幅：74.194ps
+%パルス半値幅：95.5782ps
 
 total_func_cos=zeros(length(Irr),1);
 

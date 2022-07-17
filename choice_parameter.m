@@ -1,14 +1,13 @@
-%time span at simulation [s]
-time_span=5.959*10^-16;
+%time spaat simulation [s]
+time_span=5.959*10^-13;
 
 ref_time_step=5.959*10^-12;
 ref_total_data_num=300;
 total_data_num=ref_total_data_num*ref_time_step/time_span;
 time_scale=time_span*total_data_num;
 
-time_step_div=1000;
 
-Initial_Input=5.7*10^15;%[W/cm^2]
+Initial_Input=2.29^8;%[W/cm^2]
 
 %total_time_step
 time=0:time_span:time_scale;
@@ -20,15 +19,15 @@ QD_wavelength=[550,600,0]*10^-9;
 quantum_type_number=[1,1,1];
 
 %number of QD in network [number]
-cell_num=2;
+cell_num=10;
 
 dimension=3;
 
 cell_scale=cell_num.^dimension;
 
 %parameter of SA
-iter_num=10;
-temp_num=10; 
+iter_num=2;
+temp_num=500; 
 temp_dec_rate=0.9;
 ini_temp=5*10^-3;
 ini_list=0:1:temp_num-1;

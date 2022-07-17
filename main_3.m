@@ -58,7 +58,8 @@ elseif dimension==3
 end
 
 save(strcat(folder_name,'/cell_distance_list.mat'),'Generated_qd_distance','position_value')
-
+copyfile("choice_parameter.m",folder_name)
+copyfile("data_parameter.m",folder_name)
 for tm_num=1:temp_num
     for it_num=1:iter_num
         count=count+1;
@@ -178,7 +179,7 @@ networkSys=Generate_Q_net(Generated_qd_distance,QD_type_seq,cell_scale,fluoresce
 for i=1:length(irr_wavelength_list)
     subplot(1,4,i+1)
     fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength_list(i),choice_processor);
-    
+    fluorescence_result=convert_to_ref_time(fluorescence_result,time_span,ref_time_step,length(quantum_type_number));
     [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
     check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
     
@@ -196,9 +197,10 @@ end
 
 
 fluorescence_result=cal_QD_energy_and_flu(plot_num,Irr_fix,QD_type_seq,networkSys,irr_wavelength_list(i),choice_processor);
+fluorescence_result=convert_to_ref_time(fluorescence_result,time_span,ref_time_step,length(quantum_type_number));
 [max_amp,max_position_flu]=max(fluorescence_result(:,wavelength_choice));
 check_fluorescence_signal=fluorescence_result(max_position_flu:end,wavelength_choice)./max_amp;
-
+%%
 validation_MSE=ref_loss_value;
 test_MSE=immse(test_signal(1:length(check_fluorescence_signal)),check_fluorescence_signal)
 
@@ -206,8 +208,7 @@ component_rate=nnz(QD_type_seq==1)/nnz(QD_type_seq==2)
 
 
 subplot(1,4,4)
-    time=0:time_span:time_span*(length(check_fluorescence_signal)-1);
-    time=time*10^12;
+
 plot(time,check_fluorescence_signal)
 hold on
 plot(time,test_signal(1:length(check_fluorescence_signal)))
